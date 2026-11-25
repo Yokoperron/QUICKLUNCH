@@ -1,0 +1,1 @@
+QuickLunch es un sistema web desarrollado con Django y Python para la gestión de productos y menús de un servicio de alimentación. Permite registrar, consultar y administrar productos, utilizando una base de datos relacional y una interfaz sencilla e intuitiva.
