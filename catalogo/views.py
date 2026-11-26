@@ -36,22 +36,42 @@ def registrar_producto(request):
 
 # LISTA DE PRODUCTOS
 
-
 def producto_lista(request):
+
+    busqueda = request.GET.get('buscar', '')
 
     if request.user.is_staff:
 
-        productos_activos = Producto.objects.filter(activo=True)
-
-        productos_inactivos = Producto.objects.filter(activo=False)
+        productos = Producto.objects.all()
 
     else:
 
-        productos_activos = Producto.objects.filter(activo=True)
-        
-        productos_inactivos = Producto.objects.none()
+        productos = Producto.objects.filter(activo=True)
 
-    return render(request, 'producto_lista.html',{'productos_activos': productos_activos, 'productos_inactivos': productos_inactivos})
+    # FILTRO DE BÚSQUEDA
+    if busqueda:
+        productos = productos.filter(
+            nombre__icontains=busqueda
+        )
+
+    # SEPARAR PRODUCTOS HABILITADOS Y DESHABILITADOS
+    productos_activos = productos.filter(activo=True)
+
+    productos_inactivos = productos.filter(activo=False)
+
+    return render(
+        request,
+        'producto_lista.html',
+        {
+            'productos_activos': productos_activos,
+            'productos_inactivos': productos_inactivos,
+            'busqueda': busqueda
+        }
+    )
+
+    
+
+    return render(request, 'producto_lista.html',{'productos_activos': productos_activos, 'productos_inactivos': productos_inactivos, 'busqueda':busqueda})
 
 # EDITAR PRODUCTO
 

@@ -52,6 +52,35 @@
                 </p>
             </div>
 
+    <!-- BUSCADOR DE PRODUCTOS -->
+    <form method="GET" action="{% url 'producto_lista' %}" class="mb-4">
+
+        <div class="input-group">
+
+            <input
+                type="search"
+                name="buscar"
+                class="form-control"
+                placeholder="Buscar productos..."
+                value="{{ busqueda }}"
+            >
+
+            <button type="submit" class="btn btn-success">
+                Buscar
+            </button>
+
+            {% if busqueda %}
+                <a href="{% url 'producto_lista' %}"
+                class="btn btn-outline-secondary">
+                    Limpiar
+                </a>
+            {% endif %}
+
+        </div>
+
+    </form>
+
+
             {% if user.is_authenticated and user.is_staff %}
                 <a href="{% url 'registrar_producto' %}"
                    class="btn btn-warning mt-3">
