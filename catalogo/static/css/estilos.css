@@ -21,6 +21,12 @@ body {
     font-weight: bold;
 }
 
+.nav-link {
+    color: white !important;
+    font-weight: bold;
+    margin: 10px;
+}
+
 /* ===== ENCABEZADO ===== */
 
 .hero {
@@ -135,6 +141,7 @@ body {
     text-decoration: none;
     font-weight: 600;
 }
+
 
 /* ===== MENSAJES ===== */
 

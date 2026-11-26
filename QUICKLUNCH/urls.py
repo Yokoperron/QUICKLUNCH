@@ -16,12 +16,35 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from catalogo.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    #catalogo de productos
     path('', producto_lista, name='producto_lista'),
-    path('producto/registrar/', registrar_producto, name='registrar_producto')
+
+    #registrar productos
+    path('producto/registrar/', registrar_producto, name='registrar_producto'),
+
+    #actualizar producto
+    path('producto/editar/<int:id>/', editar_producto, name='editar_producto'),
+
+    #deshabilitar producto
+    path('producto/deshabilitar_producto/<int:id>/', deshabilitar_producto, name='deshabilitar_producto'),
+
+    #habilitar producto
+    path('producto/habilitar/<int:id>/', habilitar_producto, name='habilitar_producto'),
+    
 
 
 ]
+
+# Configuración para visualizar imágenes durante el desarrollo
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT
+    )

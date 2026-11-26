@@ -1,24 +1,39 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>QuickLunch | Catálogo</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
-
 </head>
 
 <body>
 
+    <!-- BARRA DE NAVEGACIÓN -->
     <nav class="navbar">
         <div class="container">
-            <a class="navbar-brand" href="/">QuickLunch</a>
+
+            <a class="navbar-brand" href="/">
+                QuickLunch
+            </a>
+
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admin:index' %}">
+                        Administrador
+                    </a>
+                </li>
+            </ul>
+
         </div>
     </nav>
 
+    <!-- TITULO -->
     <section class="hero">
         <h1>¡Bienvenido a QuickLunch!</h1>
         <p class="mt-3">
@@ -26,18 +41,25 @@
         </p>
     </section>
 
+    <!-- PRODUCTOS CATALOGO -->
     <main class="container catalogo">
 
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="fw-bold">Nuestros productos</h2>
-                <p class="text-secondary">Explora los productos disponibles.</p>
+                <p class="text-secondary">
+                    Explora los productos disponibles.
+                </p>
             </div>
 
-            <a href="{% url 'registrar_producto' %}" class="btn btn-principal">
-                + Agregar producto
-            </a>
+            {% if user.is_authenticated and user.is_staff %}
+                <a href="{% url 'registrar_producto' %}"
+                   class="btn btn-warning mt-3">
+                    + Agregar producto
+                </a>
+            {% endif %}
         </div>
+
 
         {% if messages %}
             {% for message in messages %}
@@ -47,13 +69,43 @@
             {% endfor %}
         {% endif %}
 
-        <div class="row g-4">
 
-            {% for producto in productos %}
-                {% if producto.activo %}
+        <!-- SECCIÓN 1: PRODUCTOS HABILITADOS -->
+
+
+        <section class="mb-5">
+
+            <h3 class="fw-bold mb-4">
+                Productos habilitados
+                <span class="badge bg-success">Disponibles</span>
+            </h3>
+
+            <div class="row g-4">
+
+                {% for producto in productos_activos %}
+
                     <div class="col-md-6 col-lg-4">
+
                         <div class="producto">
 
+                            <!-- IMAGEN DEL PRODUCTO -->
+                            {% if producto.imagen %}
+                                <img
+                                    src="{{ producto.imagen.url }}"
+                                    alt="{{ producto.nombre }}"
+                                    class="img-fluid rounded mb-3"
+                                    style="width: 100%; height: 200px; object-fit: cover;"
+                                >
+                            {% else %}
+                                <div class="bg-light rounded mb-3 d-flex align-items-center justify-content-center"
+                                     style="width: 100%; height: 200px;">
+                                    <span class="text-secondary">
+                                        Sin imagen disponible
+                                    </span>
+                                </div>
+                            {% endif %}
+
+                            <!-- INFORMACIÓN -->
                             <span class="badge bg-success mb-3">
                                 Disponible
                             </span>
@@ -70,25 +122,147 @@
                                 ${{ producto.precio }}
                             </div>
 
+                            <!-- ACCIONES DEL ADMINISTRADOR -->
+                            {% if user.is_authenticated and user.is_staff %}
+
+                                <a href="{% url 'editar_producto' producto.id %}"
+                                   class="btn btn-warning mt-3">
+                                    Editar producto
+                                </a>
+
+                                <form method="POST"
+                                      action="{% url 'deshabilitar_producto' producto.id %}"
+                                      onsubmit="return confirm('¿Estás seguro de deshabilitar este producto?');">
+
+                                    {% csrf_token %}
+
+                                    <button type="submit"
+                                            class="btn btn-danger mt-2">
+                                        Deshabilitar producto
+                                    </button>
+
+                                </form>
+
+                            {% endif %}
+
                         </div>
+
                     </div>
-                {% endif %}
 
-            {% empty %}
-                <div class="col-12 text-center py-5">
-                    <h4>No hay productos registrados</h4>
-                    <p class="text-secondary">
-                        Agrega tu primer producto para comenzar.
-                    </p>
+                {% empty %}
+
+                    <div class="col-12 text-center py-4">
+                        <h5>No hay productos habilitados.</h5>
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+
+
+        <!-- SECCIÓN 2: PRODUCTOS DESHABILITADOS -->
+
+
+        {% if user.is_authenticated and user.is_staff %}
+
+            <section class="mt-5">
+
+                <hr class="mb-4">
+
+                <h3 class="fw-bold mb-4">
+                    Productos deshabilitados
+                    <span class="badge bg-danger">No disponibles</span>
+                </h3>
+
+                <div class="row g-4">
+
+                    {% for producto in productos_inactivos %}
+
+                        <div class="col-md-6 col-lg-4">
+
+                            <div class="producto">
+
+                                <!-- IMAGEN DEL PRODUCTO -->
+                                {% if producto.imagen %}
+                                    <img
+                                        src="{{ producto.imagen.url }}"
+                                        alt="{{ producto.nombre }}"
+                                        class="img-fluid rounded mb-3"
+                                        style="width: 100%; height: 200px; object-fit: cover; opacity: 0.4;"
+                                    >
+                                {% else %}
+                                    <div class="bg-light rounded mb-3 d-flex align-items-center justify-content-center"
+                                         style="width: 100%; height: 200px;">
+                                        <span class="text-secondary">
+                                            Sin imagen disponible
+                                        </span>
+                                    </div>
+                                {% endif %}
+
+                                <!-- INFORMACIÓN -->
+                                <span class="badge bg-danger mb-3">
+                                    Deshabilitado
+                                </span>
+
+                                <h4 class="fw-bold">
+                                    {{ producto.nombre }}
+                                </h4>
+
+                                <p class="text-secondary">
+                                    {{ producto.descripcion }}
+                                </p>
+
+                                <div class="precio">
+                                    ${{ producto.precio }}
+                                </div>
+
+                                <!-- ACCIONES DEL ADMINISTRADOR -->
+                                
+                                <a href="{% url 'editar_producto' producto.id %}"
+                                   class="btn btn-warning mt-3">
+                                    Editar producto
+                                </a>
+
+                                <form method="POST"
+                                      action="{% url 'habilitar_producto' producto.id %}">
+
+                                    {% csrf_token %}
+
+                                    <button type="submit"
+                                            class="btn btn-success mt-2">
+                                        Habilitar producto
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    {% empty %}
+
+                        <div class="col-12 text-center py-4">
+                            <h5>No hay productos deshabilitados.</h5>
+                        </div>
+
+                    {% endfor %}
+
                 </div>
-            {% endfor %}
 
-        </div>
+            </section>
+
+        {% endif %}
 
     </main>
 
+    <!-- PIE DE PÁGINA -->
     <footer>
-        <p class="mb-0">© 2026 QuickLunch - Sistema de gestión de productos</p>
+        <p class="mb-0">
+            QUICKLUNCH
+        </p>
     </footer>
 
 </body>

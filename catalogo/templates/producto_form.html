@@ -24,13 +24,16 @@
         <div class="formulario">
 
             <div class="mb-4">
-                <h2>Agregar producto</h2>
-                <p class="text-secondary">
-                    Completa los siguientes datos para registrar un nuevo producto.
-                </p>
+                {% if producto %}
+                    <h2>Editar producto</h2>
+                    <p>Modifica los datos del producto seleccionado.</p>
+                {% else %}
+                    <h2>Agregar producto</h2>
+                    <p>Completa los datos para registrar un producto.</p>
+                {% endif %}
             </div>
 
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
 
                 {% if formulario.errors %}
@@ -38,6 +41,22 @@
                         Revisa los campos. Hay información incorrecta.
                     </div>
                 {% endif %}
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Imagen del producto</label>
+                    {{ formulario.imagen }}
+                    {{ formulario.imagen.errors }}
+
+                    <div class="mt-3">
+                        <p class="fw-bold">Vista previa:</p>
+
+                        <img id="vista-previa"
+                            src="#"
+                            alt="Vista previa de la imagen"
+                            style="display: none; width: 100%; max-width: 300px;
+                                    height: 200px; object-fit: cover; border-radius: 10px;">
+                    </div>
+                </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-bold">Nombre del producto</label>
@@ -58,7 +77,11 @@
                 </div>
 
                 <button type="submit" class="btn btn-guardar w-100">
-                    Guardar producto
+                    {% if producto %}
+                        Guardar cambios
+                    {% else %}
+                        Registrar producto
+                    {% endif %}
                 </button>
 
                 <div class="text-center mt-4">
@@ -73,5 +96,31 @@
 
     </div>
 
+<script>
+    const campoImagen = document.getElementById('id_imagen');
+    const vistaPrevia = document.getElementById('vista-previa');
+
+    campoImagen.addEventListener('change', function(event) {
+
+        const archivo = event.target.files[0];
+
+        if (archivo) {
+
+            const lector = new FileReader();
+
+            lector.onload = function(e) {
+                vistaPrevia.src = e.target.result;
+                vistaPrevia.style.display = 'block';
+            };
+
+            lector.readAsDataURL(archivo);
+
+        } else {
+            vistaPrevia.src = '#';
+            vistaPrevia.style.display = 'none';
+        }
+
+    });
+</script>
 </body>
 </html>

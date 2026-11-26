@@ -11,7 +11,8 @@ class ProductoForm(forms.ModelForm):
         fields = [
             'nombre',
             'descripcion',
-            'precio'
+            'precio',
+            'imagen'
         ]
 
         widgets = {
@@ -25,9 +26,11 @@ class ProductoForm(forms.ModelForm):
                 'placeholder': 'Descripcion del producto'
             }),
 
-            'precio': forms.Textarea(attrs={
+            'precio': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Precio del producto'
+                'placeholder': 'Precio del producto',
+                'min': '0',
+                'step': '0'
             }),
 
             

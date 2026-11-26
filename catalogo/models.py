@@ -8,6 +8,12 @@ from django.db import models
 
 class Producto(models.Model):
 
+    imagen= models.ImageField(
+        upload_to='productos/',
+        blank=True,
+        null=True
+    )
+
     nombre = models.CharField(
         max_length=100,
         unique=True
