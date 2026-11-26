@@ -50,9 +50,7 @@ def producto_lista(request):
 
     # FILTRO DE BÚSQUEDA
     if busqueda:
-        productos = productos.filter(
-            nombre__icontains=busqueda
-        )
+        productos = productos.filter(nombre__icontains=busqueda)
 
     # SEPARAR PRODUCTOS HABILITADOS Y DESHABILITADOS
     productos_activos = productos.filter(activo=True)
